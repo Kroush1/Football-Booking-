@@ -25,6 +25,15 @@ function formatTimeArabicPeriod(time24) {
   return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
 }
 
+function formatArabicDateWithWeekday(date) {
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+  const weekday = new Date(`${date}T00:00:00.000Z`).toLocaleDateString("ar-EG", {
+    weekday: "long",
+    timeZone: "UTC",
+  });
+  return `${date} (${weekday})`;
+}
+
 function createPublicRouter(io) {
   const router = express.Router();
 
@@ -89,7 +98,7 @@ function createPublicRouter(io) {
       id: String(b._id),
       name: b.name,
       phone: b.phone,
-      date: b.date,
+      date: formatArabicDateWithWeekday(b.date),
       time: formatTimeArabicPeriod(b.time),
     }));
     const csv = stringify(rows, {
