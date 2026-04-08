@@ -280,6 +280,23 @@ td {
   margin-bottom: 18px;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.clear-all-btn {
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.clear-all-btn:hover {
+  background: #b91c1c;
+}
+
 .admin-title {
   display: flex;
   align-items: center;

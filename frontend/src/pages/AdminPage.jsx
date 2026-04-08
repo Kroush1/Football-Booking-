@@ -177,6 +177,20 @@ export default function AdminPage() {
     }
   }
 
+  async function deleteAllBookings() {
+    const confirmed = window.confirm(
+      "This will delete ALL bookings. Are you sure you want to continue?"
+    );
+    if (!confirmed) return;
+    try {
+      await adminApi.delete("/bookings");
+      setToast({ type: "success", message: "All bookings deleted" });
+      loadData();
+    } catch (_e) {
+      setToast({ type: "error", message: "Delete all failed" });
+    }
+  }
+
   async function saveEdit(e) {
     e.preventDefault();
     try {
@@ -225,9 +239,14 @@ export default function AdminPage() {
             <img className="admin-logo" src="/logo.png" alt="Kafr-Jalabta football field logo" />
             <h1>Admin Dashboard</h1>
           </div>
-          <a className="export-btn" href={`${API_BASE}/export`} target="_blank" rel="noreferrer">
-            Export CSV
-          </a>
+          <div className="admin-actions">
+            <button className="danger clear-all-btn" type="button" onClick={deleteAllBookings}>
+              Delete All Bookings
+            </button>
+            <a className="export-btn" href={`${API_BASE}/export`} target="_blank" rel="noreferrer">
+              Export CSV
+            </a>
+          </div>
         </div>
         {loading || !config ? (
           <p>Loading...</p>

@@ -27,6 +27,12 @@ function createAdminRouter(io) {
     return res.json(bookings);
   }));
 
+  router.delete("/bookings", asyncHandler(async (_req, res) => {
+    const result = await Booking.deleteMany({});
+    io.emit("booking:cleared");
+    return res.json({ message: "All bookings deleted", deletedCount: result.deletedCount });
+  }));
+
   router.put("/booking/:id", asyncHandler(async (req, res) => {
     const payload = sanitizeBookingPayload(req.body);
     const errors = validateBookingPayload(payload);
