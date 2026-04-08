@@ -12,6 +12,19 @@ const {
 } = require("../utils/validators");
 const { getOrCreateConfig, resolveSlotsForDate } = require("../services/configService");
 
+function formatTimeArabicPeriod(time24) {
+  if (!time24 || !/^\d{2}:\d{2}$/.test(time24)) return time24;
+  const [h, m] = time24.split(":").map(Number);
+  let period = "الليل";
+  if (h >= 3 && h <= 5) period = "الفجر";
+  else if (h >= 6 && h <= 11) period = "الصباح";
+  else if (h >= 12 && h <= 17) period = "العصر";
+  else period = "الليل";
+  const hour12 = h % 12 || 12;
+  if (m === 0) return `${hour12} ${period}`;
+  return `${hour12}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 function createPublicRouter(io) {
   const router = express.Router();
 
@@ -72,19 +85,27 @@ function createPublicRouter(io) {
 
   router.get("/export", asyncHandler(async (_req, res) => {
     const bookings = await Booking.find().sort({ date: 1, time: 1, createdAt: -1 }).lean();
-    const csv = stringify(bookings, {
+    const rows = bookings.map((b) => ({
+      id: String(b._id),
+      name: b.name,
+      phone: b.phone,
+      date: b.date,
+      time: formatTimeArabicPeriod(b.time),
+    }));
+    const csv = stringify(rows, {
       header: true,
       columns: [
-        { key: "_id", header: "id" },
+        { key: "id", header: "id" },
         { key: "name", header: "name" },
         { key: "phone", header: "phone" },
         { key: "date", header: "date" },
         { key: "time", header: "time" },
       ],
     });
-    res.setHeader("Content-Type", "text/csv");
+    const bom = "\ufeff"; // Helps Excel detect UTF-8 for Arabic text.
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader("Content-Disposition", 'attachment; filename="bookings.csv"');
-    return res.send(csv);
+    return res.send(bom + csv);
   }));
 
   return router;
