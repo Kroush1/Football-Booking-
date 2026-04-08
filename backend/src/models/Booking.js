@@ -13,6 +13,12 @@ const bookingSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    normalizedName: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
     date: {
       type: String,
       required: true,
@@ -26,5 +32,13 @@ const bookingSchema = new mongoose.Schema(
 );
 
 bookingSchema.index({ date: 1, time: 1 }, { unique: true });
+
+bookingSchema.pre("validate", function setNormalizedName(next) {
+  this.normalizedName = String(this.name || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  next();
+});
 
 module.exports = mongoose.model("Booking", bookingSchema);

@@ -35,6 +35,13 @@ function sanitizeBookingPayload(payload) {
   return { name, phone, date, time };
 }
 
+function normalizeName(name) {
+  return String(name || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
 function validateBookingPayload(payload) {
   const errors = [];
   if (!payload.name) errors.push("Name is required");
@@ -59,4 +66,5 @@ module.exports = {
   getWeekday,
   sanitizeBookingPayload,
   validateBookingPayload,
+  normalizeName,
 };

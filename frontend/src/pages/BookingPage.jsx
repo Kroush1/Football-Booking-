@@ -4,7 +4,8 @@ import { API_BASE, publicApi } from "../api";
 import { dateRange } from "../utils";
 import Toast from "../components/Toast";
 
-const socket = io(API_BASE, { autoConnect: true });
+const socketEnabled = !API_BASE.includes(".vercel.app");
+const socket = socketEnabled ? io(API_BASE, { autoConnect: true }) : null;
 
 function formatTimeLabel(time24) {
   if (!time24 || !/^\d{2}:\d{2}$/.test(time24)) return time24;
@@ -64,6 +65,7 @@ export default function BookingPage() {
 
   useEffect(() => {
     loadConfig();
+    if (!socket) return undefined;
     const refresh = () => {
       loadConfig();
       if (selectedDate) loadSlots(selectedDate);

@@ -12,7 +12,8 @@ const WEEKDAYS = [
   "Saturday",
   "Sunday",
 ];
-const socket = io(API_BASE, { autoConnect: true });
+const socketEnabled = !API_BASE.includes(".vercel.app");
+const socket = socketEnabled ? io(API_BASE, { autoConnect: true }) : null;
 
 function toBasicToken(username, password) {
   return btoa(`${username}:${password}`);
@@ -77,6 +78,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuth) return;
+    if (!socket) return undefined;
     const refresh = () => loadData();
     socket.on("booking:created", refresh);
     socket.on("booking:updated", refresh);

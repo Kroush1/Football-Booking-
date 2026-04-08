@@ -6,6 +6,7 @@ const {
   getWeekday,
   dateInRange,
   isValidDateString,
+  normalizeName,
   normalizeSlots,
   sanitizeBookingPayload,
   validateBookingPayload,
@@ -50,7 +51,7 @@ function createAdminRouter(io) {
     }
 
     const sameNameBooking = await Booking.findOne({
-      name: payload.name,
+      normalizedName: normalizeName(payload.name),
       _id: { $ne: req.params.id },
     }).lean();
     if (sameNameBooking) {

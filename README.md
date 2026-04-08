@@ -63,3 +63,32 @@ Full-stack football field appointment booking system with dynamic config and adm
 - CSV export endpoint: `GET http://localhost:5000/export`
 - Real-time updates are powered by Socket.io
 - Frontend includes loading states and success/error toast notifications
+
+## Deploy on Vercel (Frontend + Backend)
+
+### 1) Deploy Backend (Project 1)
+
+- Import the same GitHub repo in Vercel.
+- Set **Root Directory** to `backend`.
+- Framework preset: **Other**.
+- Build/Output can stay default (using `backend/vercel.json`).
+- Add Environment Variables:
+  - `MONGO_URI`
+  - `ADMIN_USERNAME`
+  - `ADMIN_PASSWORD`
+- Deploy and copy backend URL, example:
+  - `https://football-backend.vercel.app`
+
+### 2) Deploy Frontend (Project 2)
+
+- Import the same GitHub repo again in Vercel (second project).
+- Set **Root Directory** to `frontend`.
+- Framework preset: **Vite**.
+- Add environment variable:
+  - `VITE_API_BASE=https://football-backend.vercel.app`
+- Deploy.
+
+### 3) Important Limitation
+
+- Vercel serverless functions do not keep persistent WebSocket connections.
+- The app API works on Vercel, but real-time Socket.io updates are disabled in serverless mode.

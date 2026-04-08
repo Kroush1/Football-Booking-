@@ -6,6 +6,7 @@ const {
   getWeekday,
   dateInRange,
   isValidDateString,
+  normalizeName,
   sanitizeBookingPayload,
   validateBookingPayload,
 } = require("../utils/validators");
@@ -46,7 +47,9 @@ function createPublicRouter(io) {
       return res.status(400).json({ message: errors.join(", ") });
     }
 
-    const existingNameBooking = await Booking.findOne({ name: payload.name }).lean();
+    const existingNameBooking = await Booking.findOne({
+      normalizedName: normalizeName(payload.name),
+    }).lean();
     if (existingNameBooking) {
       return res.status(409).json({ message: "الاسم مسجل مسبقًا" });
     }
