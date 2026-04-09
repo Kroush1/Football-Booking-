@@ -57,6 +57,30 @@ function normalizeName(name) {
     .toLowerCase();
 }
 
+function normalizePhone(phone) {
+  return String(phone || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/-/g, "");
+}
+
+function formatISODateUTC(dateObj) {
+  const y = dateObj.getUTCFullYear();
+  const m = String(dateObj.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dateObj.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+// Week starts on Friday by default (UTC day: 5)
+function getWeekStartDate(date, weekStartsOn = 5) {
+  if (!isValidDateString(date)) return "";
+  const d = new Date(`${date}T00:00:00.000Z`);
+  const day = d.getUTCDay(); // 0..6 (Sun..Sat)
+  const diff = (day - weekStartsOn + 7) % 7;
+  d.setUTCDate(d.getUTCDate() - diff);
+  return formatISODateUTC(d);
+}
+
 function validateBookingPayload(payload) {
   const errors = [];
   if (!payload.name) errors.push("Name is required");
@@ -82,5 +106,7 @@ module.exports = {
   sanitizeBookingPayload,
   validateBookingPayload,
   normalizeName,
+  normalizePhone,
+  getWeekStartDate,
   isPastDate,
 };

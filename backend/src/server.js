@@ -26,13 +26,16 @@ app.use("/admin", createAdminRouter(io));
 
 app.use((err, _req, res, _next) => {
   if (err?.code === 11000) {
-    const field = Object.keys(err.keyPattern || {})[0];
-    if (field === "phone") {
-      return res.status(409).json({ message: "رقم الهاتف لديه حجز مسبقًا" });
+    const keyPattern = err.keyPattern || {};
+    const hasSameWeekKeys =
+      keyPattern.normalizedName && keyPattern.normalizedPhone && keyPattern.weekStart;
+    if (hasSameWeekKeys) {
+      return res
+        .status(409)
+        .json({ message: "لا يمكن الحجز بنفس الاسم ورقم الهاتف في نفس الأسبوع" });
     }
-    if (field === "normalizedName") {
-      return res.status(409).json({ message: "الاسم مسجل مسبقًا" });
-    }
+
+    const field = Object.keys(keyPattern)[0];
     if (field === "date" || field === "time") {
       return res.status(409).json({ message: "هذا الموعد محجوز بالفعل" });
     }

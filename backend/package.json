@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "cleanup:names": "node scripts/cleanupDuplicateNames.js"
+    "cleanup:names": "node scripts/cleanupDuplicateNames.js",
+    "migrate:indexes": "node scripts/migrateIndexes.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

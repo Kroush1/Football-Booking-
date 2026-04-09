@@ -8,6 +8,8 @@ const {
   isValidDateString,
   isPastDate,
   normalizeName,
+  normalizePhone,
+  getWeekStartDate,
   sanitizeBookingPayload,
   validateBookingPayload,
 } = require("../utils/validators");
@@ -73,11 +75,16 @@ function createPublicRouter(io) {
       return res.status(400).json({ message: errors.join(", ") });
     }
 
-    const existingNameBooking = await Booking.findOne({
+    const weekStart = getWeekStartDate(payload.date);
+    const existingSameWeek = await Booking.findOne({
       normalizedName: normalizeName(payload.name),
+      normalizedPhone: normalizePhone(payload.phone),
+      weekStart,
     }).lean();
-    if (existingNameBooking) {
-      return res.status(409).json({ message: "الاسم مسجل مسبقًا" });
+    if (existingSameWeek) {
+      return res.status(409).json({
+        message: "لا يمكن الحجز بنفس الاسم ورقم الهاتف في نفس الأسبوع",
+      });
     }
 
     const config = await getOrCreateConfig();

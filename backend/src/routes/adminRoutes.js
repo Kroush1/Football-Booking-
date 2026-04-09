@@ -7,6 +7,8 @@ const {
   dateInRange,
   isValidDateString,
   normalizeName,
+  normalizePhone,
+  getWeekStartDate,
   normalizeSlots,
   sanitizeBookingPayload,
   validateBookingPayload,
@@ -56,12 +58,17 @@ function createAdminRouter(io) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    const sameNameBooking = await Booking.findOne({
+    const weekStart = getWeekStartDate(payload.date);
+    const sameWeekSamePerson = await Booking.findOne({
       normalizedName: normalizeName(payload.name),
+      normalizedPhone: normalizePhone(payload.phone),
+      weekStart,
       _id: { $ne: req.params.id },
     }).lean();
-    if (sameNameBooking) {
-      return res.status(409).json({ message: "الاسم مسجل مسبقًا" });
+    if (sameWeekSamePerson) {
+      return res.status(409).json({
+        message: "لا يمكن الحجز بنفس الاسم ورقم الهاتف في نفس الأسبوع",
+      });
     }
 
     existing.name = payload.name;

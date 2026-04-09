@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { normalizeName, normalizePhone, getWeekStartDate } = require("../utils/validators");
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -10,13 +11,16 @@ const bookingSchema = new mongoose.Schema(
     phone: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     normalizedName: {
       type: String,
       required: true,
-      unique: true,
+      trim: true,
+    },
+    normalizedPhone: {
+      type: String,
+      required: true,
       trim: true,
     },
     date: {
@@ -27,17 +31,24 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    weekStart: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
 bookingSchema.index({ date: 1, time: 1 }, { unique: true });
+bookingSchema.index(
+  { normalizedName: 1, normalizedPhone: 1, weekStart: 1 },
+  { unique: true }
+);
 
-bookingSchema.pre("validate", function setNormalizedName(next) {
-  this.normalizedName = String(this.name || "")
-    .trim()
-    .replace(/\s+/g, " ")
-    .toLowerCase();
+bookingSchema.pre("validate", function setDerivedFields(next) {
+  this.normalizedName = normalizeName(this.name);
+  this.normalizedPhone = normalizePhone(this.phone);
+  this.weekStart = getWeekStartDate(this.date);
   next();
 });
 
