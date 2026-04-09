@@ -1,6 +1,21 @@
 const PHONE_REGEX = /^[0-9+\-\s]{7,20}$/;
 const TIME_REGEX = /^([01]\d|2[0-3]):00$/;
 
+function todayInTimeZone(timeZone) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
+function isPastDate(date, timeZone = "Africa/Cairo") {
+  if (!isValidDateString(date)) return false;
+  const today = todayInTimeZone(timeZone);
+  return date < today;
+}
+
 function isValidDateString(date) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const d = new Date(`${date}T00:00:00.000Z`);
@@ -67,4 +82,5 @@ module.exports = {
   sanitizeBookingPayload,
   validateBookingPayload,
   normalizeName,
+  isPastDate,
 };

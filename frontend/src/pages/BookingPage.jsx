@@ -60,7 +60,12 @@ export default function BookingPage() {
 
   const dates = useMemo(() => {
     if (!config) return [];
-    return dateRange(config.startDate, config.endDate);
+    const all = dateRange(config.startDate, config.endDate);
+    const now = new Date();
+    const todayLocal = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(
+      now.getDate()
+    ).padStart(2, "0")}`;
+    return all.filter((d) => d >= todayLocal);
   }, [config]);
 
   useEffect(() => {

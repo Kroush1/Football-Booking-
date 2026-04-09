@@ -6,6 +6,7 @@ const {
   getWeekday,
   dateInRange,
   isValidDateString,
+  isPastDate,
   normalizeName,
   sanitizeBookingPayload,
   validateBookingPayload,
@@ -49,6 +50,9 @@ function createPublicRouter(io) {
     }
 
     const config = await getOrCreateConfig();
+    if (isPastDate(String(date))) {
+      return res.json({ date: String(date), slots: [] });
+    }
     if (!dateInRange(date, config.startDate, config.endDate)) {
       return res.json({ date, slots: [] });
     }
@@ -77,6 +81,9 @@ function createPublicRouter(io) {
     }
 
     const config = await getOrCreateConfig();
+    if (isPastDate(payload.date)) {
+      return res.status(400).json({ message: "لا يمكن الحجز في يوم انتهى" });
+    }
     if (!dateInRange(payload.date, config.startDate, config.endDate)) {
       return res.status(400).json({ message: "Date is outside allowed range" });
     }
