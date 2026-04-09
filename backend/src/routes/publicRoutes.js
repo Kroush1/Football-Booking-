@@ -92,8 +92,15 @@ function createPublicRouter(io) {
     return res.status(201).json(booking);
   }));
 
-  router.get("/export", asyncHandler(async (_req, res) => {
-    const bookings = await Booking.find().sort({ date: 1, time: 1, createdAt: -1 }).lean();
+  router.get("/export", asyncHandler(async (req, res) => {
+    const { date } = req.query || {};
+    const dateStr = date ? String(date) : "";
+    if (dateStr && !isValidDateString(dateStr)) {
+      return res.status(400).json({ message: "date query must be YYYY-MM-DD" });
+    }
+
+    const filter = dateStr ? { date: dateStr } : {};
+    const bookings = await Booking.find(filter).sort({ date: 1, time: 1, createdAt: -1 }).lean();
     const rows = bookings.map((b) => ({
       id: String(b._id),
       name: b.name,
@@ -113,7 +120,8 @@ function createPublicRouter(io) {
     });
     const bom = "\ufeff"; // Helps Excel detect UTF-8 for Arabic text.
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
-    res.setHeader("Content-Disposition", 'attachment; filename="bookings.csv"');
+    const safeSuffix = dateStr ? `-${dateStr}` : "-all";
+    res.setHeader("Content-Disposition", `attachment; filename="bookings${safeSuffix}.csv"`);
     return res.send(bom + csv);
   }));
 

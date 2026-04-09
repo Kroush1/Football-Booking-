@@ -333,6 +333,19 @@ td {
   border-color: #93c5fd;
 }
 
+.export-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.export-date {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #d0d7e2;
+}
+
 .admin-section {
   margin-top: 16px;
   padding-top: 12px;

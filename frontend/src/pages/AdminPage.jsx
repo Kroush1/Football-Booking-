@@ -66,6 +66,7 @@ export default function AdminPage() {
   const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [config, setConfig] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [exportDate, setExportDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(null);
   const [toast, setToast] = useState(null);
@@ -117,6 +118,7 @@ export default function AdminPage() {
         slotsText: (configRes.data.availableSlots || []).map(formatTimeLabel).join(", "),
       });
       setBookings(bookingsRes.data);
+      setExportDate((prev) => prev || configRes.data.startDate || "");
     } catch (_e) {
       setToast({ type: "error", message: "Failed to load admin data" });
       setIsAuth(false);
@@ -243,9 +245,26 @@ export default function AdminPage() {
             <button className="danger clear-all-btn" type="button" onClick={deleteAllBookings}>
               Delete All Bookings
             </button>
-            <a className="export-btn" href={`${API_BASE}/export`} target="_blank" rel="noreferrer">
-              Export CSV
-            </a>
+            <div className="export-controls">
+              <input
+                type="date"
+                value={exportDate}
+                onChange={(e) => setExportDate(e.target.value)}
+                className="export-date"
+                aria-label="Export date"
+              />
+              <a
+                className="export-btn"
+                href={`${API_BASE}/export?date=${encodeURIComponent(exportDate)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Export Day CSV
+              </a>
+              <a className="export-btn" href={`${API_BASE}/export`} target="_blank" rel="noreferrer">
+                Export All CSV
+              </a>
+            </div>
           </div>
         </div>
         {loading || !config ? (
